@@ -25,7 +25,7 @@ void SFilter(float *fData,int nDataLen,double* acoef,double *bcoef,int N);
 float SCalcPitchValue(float *fDataBuf, int nDataLen, float fPend,int nIndexMax, int nIndexMin, int fs);
 
 /* compute the evergy curve */
-float SGetEnergyVec(float *fData, int nLen, long nFrmSht, float *&EnergyVec, int &nEnergyLen);
+float SGetEnergyVec(float *fData, int nLen, int32_t nFrmSht, float *&EnergyVec, int &nEnergyLen);
 
 void SCalcDifFunction(const float *fData,int nFrm, int nIndexMax, float fPend,float *oDataBuf);
 

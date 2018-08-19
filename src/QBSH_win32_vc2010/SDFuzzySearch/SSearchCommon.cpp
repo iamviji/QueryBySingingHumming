@@ -20,11 +20,12 @@ int SGetNotesPitchLen(SNote *sNotes, int nStartNote, int nNotes){
 	return iTotalPitch;
 }
 
+#if 0//VIJAYA_KUMAR
 /*  Compare two float value, this function is mainly used for qsort */
 int _compareFloat(const void *a, const void *b){
 	return (*(float*)a > *(float*)b)? 1:-1; 
 }
-
+#endif
 
 /*  For normalizing the note sequence, note shift in vertical direction */
 void SNormSongNote(SNote *Notes, int iNoteSize,int iLen){

@@ -11,10 +11,10 @@
 
 #include "SModel.h"
 //#include "SSearch.h"
-#ifdef WIN32
+//#ifdef WIN32
 	#include "SDFuzzySearch.h"
-	#pragma comment(lib, "SDFuzzySearch.lib")
-#endif
+//	#pragma comment(lib, "SDFuzzySearch.lib")
+//#endif
 #include "SUtil.h"
 #include "SMelody.h"
 #include <stdio.h>
@@ -99,7 +99,7 @@ int STester(char* szModel, char* szModelinfo, char* szWav, char* szOut){
 	FILE *OutFile=fopen(szOut,"a+t");
 	fprintf(OutFile,"%s ",szWav);
 	for(i=0;i<20;i++){
-		fprintf(OutFile,"%d: %s, %f; ",myDTWResStru[i].nModelID+1,szModelInfoStrs[myDTWResStru[i].nModelID], myDTWResStru[i].fScore);
+		fprintf(OutFile,"%d: %s, %f;\n",myDTWResStru[i].nModelID+1,szModelInfoStrs[myDTWResStru[i].nModelID], myDTWResStru[i].fScore);
 		printf("%d: %s, %f\n",myDTWResStru[i].nModelID+1,szModelInfoStrs[myDTWResStru[i].nModelID], myDTWResStru[i].fScore);
 	}
 	fprintf(OutFile,"\n");
@@ -151,6 +151,7 @@ int STester(char* szModel, char* szModelinfo, char* szWav, char* szOut){
 
 
 int main(int argc, char* argv[]){
+	//printf ("long=%d,short=%d,int=%d\n", sizeof(long), sizeof(short), sizeof (int));
 	if (argc != 5){ 
 		printf("usage: SDHumming.exe QBHModel.dat QBHModel.info test.wav result.txt \n"); 
 		return 0; 

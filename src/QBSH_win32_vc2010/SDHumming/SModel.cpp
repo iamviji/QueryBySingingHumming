@@ -24,7 +24,7 @@ int SLoadModel(char* ModelFile, SModel *&SQBHModels, int &nModels){
 	
 	fread(&file_count,sizeof(int),1,fp); 
 	nModels=file_count;
-    SQBHModels=new SModel[nModels];
+    	SQBHModels=new SModel[nModels];
 	if (NULL==SQBHModels) {
 		return ERROR_CODE_CANNOT_ALLOC_MEM;
 	}

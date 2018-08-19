@@ -14,6 +14,7 @@
 #include "SMelody.h"
 #include <math.h>
 #include <stdio.h>
+int _gFS = 8000; //VIJAY
 
 /* extract pitch contour of the input sound file */
 int SPitchExtraction(SWaveDataStru mySWaveDataStru, float pendiente, float fmin, float fmax, 
@@ -76,7 +77,7 @@ int SPitchExtraction(SWaveDataStru mySWaveDataStru, float pendiente, float fmin,
 /* normalize the input data */
 void NormalizeData(float *data, int nLen, float max){
 	float fMaxTemp=-1;
-	long ind;
+	int32_t ind;
 	int i=0;
 	for( i=0;i<nLen;i++){
 		if(fMaxTemp<fabsf(data[i])){
@@ -108,7 +109,7 @@ int WaveRead(char* filename, SWaveDataStru &mySWaveDataStru){
 
 	fseek(fp, 0, SEEK_SET);
 	nRead=fread(&szHeader, sizeof(WAVE_HEADER), 1, fp);
-
+	printf ("BitPerSampe=%d\n", szHeader.BitPerSample);
     if(szHeader.BitPerSample==8){
             char *TmpBuf=new char[nLen];
             nRead=fread(TmpBuf, sizeof(char), nLen, fp);
@@ -153,7 +154,7 @@ int SPitchContourExtraction(char* filename,float*& fPitchData,int &nFrm){
 		printf("Error on WaveRead\n");
 		return -1;
 	}
-	mySWaveDataStru.fs=8000;
+	mySWaveDataStru.fs=_gFS;
 	SPitchExtraction(mySWaveDataStru, 0.0015f, MIN_PITCH_VALUE, MAX_PITCH_VALUE, 50, 500,fPitchData,nFrm);
 	delete[] mySWaveDataStru.fDataBuf;
 	return 0;

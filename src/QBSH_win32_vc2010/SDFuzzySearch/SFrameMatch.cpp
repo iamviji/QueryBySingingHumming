@@ -13,9 +13,9 @@
 #include "SFrameMatch.h"
 #include <stdio.h>
 #include <math.h>
-float pMatrix[800][800];
-#define QRY_LEN 820
-#define TPL_LEN 1200
+float pMatrix[2000][2000];//VIJAY
+#define QRY_LEN 2000	//VIJAY
+#define TPL_LEN 2000
 
 inline float Dist2(float x,float y){
 	return (float)fabs(x-y);
@@ -35,9 +35,9 @@ inline float GetMinDis(float* pDis,int len,int *index){
 /* compute the frame-based similarity of two vector */
 float SCalcDTWDistance(float* Qry, int lenQry, float* Lib, int lenLib){
 	if (lenQry>QRY_LEN)
-		printf("Error: Query Length too large\n");
+		printf("Error: Query Length too large%d\n", lenQry);
 	if (lenLib>TPL_LEN)
-		printf("Error: Template Length too large\n");
+		printf("Error: Template Length too large%d\n", lenLib);
 	
 	int r,t;
 	int iMin,iMax;

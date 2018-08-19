@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <string.h>
 
-double DotProduct (const double *dpSrc1, const double *dpSrc2,long lCount){
-	long lLoopCntr;
+double DotProduct (const double *dpSrc1, const double *dpSrc2,int32_t lCount){
+	int32_t lLoopCntr;
 	double dDotProd = 0.0;
 
 	for (lLoopCntr = 0L; lLoopCntr < lCount; lLoopCntr++){
@@ -23,8 +23,8 @@ double DotProduct (const double *dpSrc1, const double *dpSrc2,long lCount){
 	return dDotProd;
 }
 
-float DotProduct (const float *dpSrc1, const float *dpSrc2,long lCount){
-	long lLoopCntr;
+float DotProduct (const float *dpSrc1, const float *dpSrc2,int32_t lCount){
+	int32_t lLoopCntr;
 	float dDotProd = 0.0;
 
 	for (lLoopCntr = 0L; lLoopCntr < lCount; lLoopCntr++){
@@ -39,8 +39,8 @@ void CplxMul (Complex* spCplxDest, double dSrc){
 	spCplxDest->I *= dSrc;
 }
 
-void Mul (Complex* spCplxDest, double dSrc, long lCount){
-	long lLoopCntr;
+void Mul (Complex* spCplxDest, double dSrc, int32_t lCount){
+	int32_t lLoopCntr;
 
 	for (lLoopCntr = 0L; lLoopCntr < lCount; lLoopCntr++)	{
 		CplxMul(&spCplxDest[lLoopCntr], dSrc);
@@ -57,8 +57,8 @@ void CplxMul (Complex* spCplxDest, const Complex* spCplxSrc1,
 
 
 void Mul (Complex* spCplxDest, const Complex* spCplxSrc1,
-		  const Complex* spCplxSrc2, long lCount){
-	long lLoopCntr;
+		  const Complex* spCplxSrc2, int32_t lCount){
+	int32_t lLoopCntr;
 
 	for (lLoopCntr = 0L; lLoopCntr < lCount; lLoopCntr++){
 		CplxMul(&spCplxDest[lLoopCntr], &spCplxSrc1[lLoopCntr],
@@ -73,7 +73,7 @@ Complex ProdC(Complex Src1, Complex Src2){
 }
 
 Complex* ProdC(Complex* Src1, int nLen,  double Src2){
-	long i;
+	int32_t i;
 	Complex* dst=new Complex[nLen];
 
 	for (i=0; i < nLen; i++){
@@ -84,7 +84,7 @@ Complex* ProdC(Complex* Src1, int nLen,  double Src2){
 }
 
 void ProdC(Complex* Src1, int nLen,  double Src2, Complex* dst){
-	long i;
+	int32_t i;
 
 	for (i=0; i < nLen; i++){
 		dst[i].R=Src1[i].R*Src2;
@@ -93,8 +93,8 @@ void ProdC(Complex* Src1, int nLen,  double Src2, Complex* dst){
 	return ;
 }
 
-Complex* UnosC(long Src){
-	long i;
+Complex* UnosC(int32_t Src){
+	int32_t i;
 	Complex* dest=new Complex[Src];
 
 	for (i=0; i < Src; i++){
@@ -116,8 +116,8 @@ void CplxDiv (Complex* spCplxDest, const Complex* spCplxSrc1,
 
 
 void Div (Complex* spCplxDest, const Complex* spCplxSrc1,
-		  const Complex* spCplxSrc2, long lCount){
-	long lLoopCntr;
+		  const Complex* spCplxSrc2, int32_t lCount){
+	int32_t lLoopCntr;
 
 	for (lLoopCntr = 0L; lLoopCntr < lCount; lLoopCntr++)	{
 		CplxDiv(&spCplxDest[lLoopCntr], &spCplxSrc1[lLoopCntr],
@@ -160,8 +160,8 @@ void CplxDiv (Complex* spCplxDest, const Complex* spCplxSrc){
 	spCplxDest->I = dImag;
 }
 
-void Div (Complex* spCplxDest, const Complex* spCplxSrc, long lCount){
-	long lLoopCntr;
+void Div (Complex* spCplxDest, const Complex* spCplxSrc, int32_t lCount){
+	int32_t lLoopCntr;
 
 	for (lLoopCntr = 0L; lLoopCntr < lCount; lLoopCntr++){
 		CplxDiv(&spCplxDest[lLoopCntr], &spCplxSrc[lLoopCntr]);
@@ -169,10 +169,10 @@ void Div (Complex* spCplxDest, const Complex* spCplxSrc, long lCount){
 }
 
 Complex* Sqr(Complex* Src,int nLen){
-	long N = nLen;
+	int32_t N = nLen;
 	Complex* dest=new Complex[N];
 
-	for (long i=0; i < N; i++){
+	for (int32_t i=0; i < N; i++){
 		dest[i].R = pow(Src[i].R,2) - pow(Src[i].I,2);
 		dest[i].I = 2 * Src[i].R * Src[i].I;
 	}
@@ -180,9 +180,9 @@ Complex* Sqr(Complex* Src,int nLen){
 }
 
 void Sqr(Complex* Src,int nLen, Complex* dst){
-	long N = nLen;
+	int32_t N = nLen;
 
-	for (long i=0; i < N; i++){
+	for (int32_t i=0; i < N; i++){
 		dst[i].R = pow(Src[i].R,2) - pow(Src[i].I,2);
 		dst[i].I = 2 * Src[i].R * Src[i].I;
 	}
@@ -196,8 +196,8 @@ void Cart2Polar (SPolar* spPolar, const Complex* spCplx){
 
 
 void CartToPolar (SPolar* spPolar, const Complex* spCart,
-				  long lCount){
-	long lLoopCntr;
+				  int32_t lCount){
+	int32_t lLoopCntr;
 
 	for (lLoopCntr = 0L; lLoopCntr < lCount; lLoopCntr++){
 		Cart2Polar(&spPolar[lLoopCntr], &spCart[lLoopCntr]);
@@ -211,8 +211,8 @@ void Polar2Cart (Complex* spCplx, const SPolar* spPolar){
 
 
 void PolarToCart (Complex* spCart, const SPolar* spPolar,
-				  long lCount){
-	long lLoopCntr;
+				  int32_t lCount){
+	int32_t lLoopCntr;
 
 	for (lLoopCntr = 0L; lLoopCntr < lCount; lLoopCntr++){
 		Polar2Cart(&spCart[lLoopCntr], &spPolar[lLoopCntr]);
@@ -221,13 +221,13 @@ void PolarToCart (Complex* spCart, const SPolar* spPolar,
 
 Complex* Sqrt(Complex* Src,int nLen){
 
-	long N = nLen;
+	int32_t N = nLen;
 	SPolar* auxPolar=new SPolar[N];
 	Complex* dest=new Complex[N];
 
 	CartToPolar(auxPolar,Src,N);
 
-	for (long i=0; i < N; i++){
+	for (int32_t i=0; i < N; i++){
 		auxPolar[i].M = sqrt(auxPolar[i].M);
 		auxPolar[i].P /= 2;
 	}
@@ -239,12 +239,12 @@ Complex* Sqrt(Complex* Src,int nLen){
 
 void Sqrt(Complex* Src,int nLen, Complex* dest){
 
-	long N = nLen;
+	int32_t N = nLen;
 	SPolar* auxPolar=new SPolar[N];
 
 	CartToPolar(auxPolar,Src,N);
 
-	for (long i=0; i < N; i++){
+	for (int32_t i=0; i < N; i++){
 		auxPolar[i].M = sqrt(auxPolar[i].M);
 		auxPolar[i].P /= 2;
 	}
@@ -355,7 +355,7 @@ float * LeastSquare(float A[3][5], int nLen, float *fData, int N){
 	return xv;
 }
 
-void ParabolicInterpolation(float &Min, float &Pos, long i,float *m_datos){
+void ParabolicInterpolation(float &Min, float &Pos, int32_t i,float *m_datos){
 	const int nPoints = 5;
 	const int orden = 2;
 	int j;
@@ -390,7 +390,7 @@ void ParabolicInterpolation(float &Min, float &Pos, long i,float *m_datos){
 float SCalcPitchValue(float *fData, int nDataLen, float m_pendiente,int nIndexMax, int nIndexMin, int fs){
 	const float VoiceThreshold = 0.17f;
 	float min, minimum, posMin;
-	long indMin;
+	int32_t indMin;
 	float fThreshold, f0;
 
 	min=9999999.9f;
@@ -408,7 +408,7 @@ float SCalcPitchValue(float *fData, int nDataLen, float m_pendiente,int nIndexMa
 	}else{
 		float minValue=99999.0f;
 		float minPos=-1.0f;
-		for (long i=nIndexMin; i < nIndexMax-2; i++){
+		for (int32_t i=nIndexMin; i < nIndexMax-2; i++){
 			if ((fData[i-1] > fData[i]) & (fData[i+1] > fData[i]) & (fData[i] < VoiceThreshold + m_pendiente*(i+1))){
 				ParabolicInterpolation(minimum, posMin, i,fData);
 				if(minValue>minimum){
@@ -885,8 +885,8 @@ void Reverse(double* dpSrc,int N){
 	double *tmp=new double[N];
 	memcpy(tmp,dpSrc,sizeof(double)*N);
 
-	long lLoopCntr;
-	long lMax;
+	int32_t lLoopCntr;
+	int32_t lMax;
 
 	lMax = N - 1L;
 	for (lLoopCntr = 0L; lLoopCntr <= lMax; lLoopCntr++){
@@ -903,10 +903,10 @@ void SFilter(float *fData,int nDataLen,double* m_acoef,double *m_bcoef,int N){
 	memset(y,0,nDataLen*sizeof(double));
 	memcpy(b, m_bcoef+1, (N-1)*sizeof(double));;
 
-	long i=0;
+	int32_t i=0;
 	int j=0;
 	for ( i = 0; i < N-1; i++){
-		long k=0;
+		int32_t k=0;
 		for ( k = 0; k <= i; k++)
 			y[i] += m_acoef[k] * fData[i - k];
 
@@ -969,16 +969,16 @@ float GetMean(const float *fData, int nLen){
 }
 
 
-void GetEnergyCurve (float *fpDest, const float *fpSrc, long nFrmSht, long nSamplePoints){
-	long i;
-	long nFrms;
+void GetEnergyCurve (float *fpDest, const float *fpSrc, int32_t nFrmSht, int32_t nSamplePoints){
+	int32_t i;
+	int32_t nFrms;
 
 	nFrms = nSamplePoints / nFrmSht;
 	for (i = 0; i < nFrms; i++)
 		fpDest[i] = GetMean(fpSrc+i*nFrmSht,nFrmSht);
 }
 
-float SGetEnergyVec(float *fData, int nLen, long nFrmSht, float *&EnergyVec, int &nEnergyLen){
+float SGetEnergyVec(float *fData, int nLen, int32_t nFrmSht, float *&EnergyVec, int &nEnergyLen){
 	float * fDataTemp, *fcorte;
 	fDataTemp=new float[nLen];
 	memcpy(fDataTemp,fData,sizeof(float)*nLen);

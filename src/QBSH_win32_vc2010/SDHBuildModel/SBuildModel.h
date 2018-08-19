@@ -15,6 +15,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <string.h>
 using namespace std;
 
 typedef struct {

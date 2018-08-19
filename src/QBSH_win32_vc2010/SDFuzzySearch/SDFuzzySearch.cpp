@@ -108,7 +108,7 @@ int _compareEMDRes(const void *a, const void *b){
 	float fDist=0.0f;
 	float fSpan=0.0f,fCenter=0.0f,s_1=0.0f,s1=0.0f,s0=0.0f,fSmin=0.0f;
 
-    float *fDesDataBuf=NULL;
+    	float *fDesDataBuf=NULL;
 	float *fSrcDataBuf = new float[nQueryPitchVectorLen];
 	int nRemoveSilenceCount=nQueryPitchVectorLen;
 	int MaxTemplatelen=0;

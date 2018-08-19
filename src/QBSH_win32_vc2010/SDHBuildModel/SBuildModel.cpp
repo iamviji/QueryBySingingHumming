@@ -104,8 +104,8 @@ int BuildSDHummingModel::Write2Model(){
 	char ModelIDTableFile[1024]="";
 	strcpy(NewModelFile,m_pszModelDir);
 	strcpy(ModelIDTableFile,m_pszModelDir);
-	strcat(NewModelFile,"\\QBH.Model");
-	strcat(ModelIDTableFile,"\\QBHModel.info");
+	strcat(NewModelFile,"/QBH.Model");
+	strcat(ModelIDTableFile,"/QBHModel.info");
 	
 	multimap<int, MidiMetaInfo>::iterator Iter;
 	for (Iter=m_FileTrackmap.begin();Iter!=m_FileTrackmap.end();++Iter){
@@ -125,10 +125,12 @@ int BuildSDHummingModel::Write2Model(){
 
 vector<string> ReadFromFile(char* filename){
 	vector<string> AllStrs;
-	ifstream infile;
-	infile.open(filename,NULL);
+	ifstream infile;//VIJAYA_KUMAR
+	//std::ios_base::openmode mode  = std::ios_base::in;
+	infile.open(filename);
 	string str; 
-	if(infile != NULL){
+	//if(infile != NULL){
+	if(infile.is_open ()){
 		while(getline(infile,str,'\n')) {
 			AllStrs.push_back(str);
 		}
@@ -165,11 +167,12 @@ int BuildSDHummingModel::GenFilelist(){
 	string MetaInfo="";
 	int trackNo=0;
 	ifstream InputModelFile;
-	
-	ConvertMidilist(m_pszFileList,"tmplist.txt");
+	//VIJAYA_KUMAR	
+	ConvertMidilist((char*)m_pszFileList,(char*)"tmplist.txt");
 	
 	//Read for the first time to get the total line, and remove the last line
-	InputModelFile.open("tmplist.txt",NULL);
+	//std::ios_base::openmode mode  = std::ios_base::in;
+	InputModelFile.open("tmplist.txt");
 	if(!InputModelFile){
 		std::cout<<"failed"<<endl;
 		return false;
@@ -183,7 +186,7 @@ int BuildSDHummingModel::GenFilelist(){
 	InputModelFile.close();
 	
 	//Read for the second time to get each item
-	InputModelFile.open("tmplist.txt",NULL);
+	InputModelFile.open("tmplist.txt");
 	if(!InputModelFile){
 		std::cout<<"failed"<<endl;
 		return false;
@@ -210,7 +213,9 @@ string BuildSDHummingModel::GetSongName(string myStr){
 
 int BuildSDHummingModel::writeSongInfo(char *OutputModelFileName){
 	ofstream OUTFILE;
-	OUTFILE.open(OutputModelFileName,NULL);
+	//VIJAYA_KUMAR
+	//std::ios_base::openmode mode  = std::ios_base::in;
+	OUTFILE.open(OutputModelFileName);
 	vector<ModelStru>::iterator VecIter;
 	OUTFILE<<m_QBHModel.size()<<endl;
 	for(VecIter=m_QBHModel.begin();VecIter!=m_QBHModel.end();++VecIter){

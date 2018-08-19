@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include "midifile.h"
 
 /*
@@ -24,7 +25,7 @@ struct MidiFileTrack
 {
 	struct MidiFile *midi_file;
 	int number;
-	long end_tick;
+	int32_t end_tick;
 	struct MidiFileTrack *previous_track;
 	struct MidiFileTrack *next_track;
 	struct MidiFileEvent *first_event;
@@ -38,7 +39,7 @@ struct MidiFileEvent
 	struct MidiFileEvent *next_event_in_track;
 	struct MidiFileEvent *previous_event_in_file;
 	struct MidiFileEvent *next_event_in_file;
-	long tick;
+	int32_t tick;
 	MidiFileEventType_t type;
 
 	union
@@ -160,19 +161,19 @@ static void write_uint16(FILE *out, unsigned short value)
 	fwrite(buffer, 1, 2, out);
 }
 
-static unsigned long interpret_uint32(unsigned char *buffer)
+static uint32_t interpret_uint32(unsigned char *buffer)
 {
-	return ((unsigned long)(buffer[0]) << 24) | ((unsigned long)(buffer[1]) << 16) | ((unsigned long)(buffer[2]) << 8) | (unsigned long)(buffer[3]);
+	return ((uint32_t)(buffer[0]) << 24) | ((uint32_t)(buffer[1]) << 16) | ((uint32_t)(buffer[2]) << 8) | (uint32_t)(buffer[3]);
 }
 
-static unsigned long read_uint32(FILE *in)
+static uint32_t read_uint32(FILE *in)
 {
 	unsigned char buffer[4];
 	fread(buffer, 1, 4, in);
 	return interpret_uint32(buffer);
 }
 
-static void write_uint32(FILE *out, unsigned long value)
+static void write_uint32(FILE *out, uint32_t value)
 {
 	unsigned char buffer[4];
 	buffer[0] = (unsigned char)(value >> 24);
@@ -182,10 +183,10 @@ static void write_uint32(FILE *out, unsigned long value)
 	fwrite(buffer, 1, 4, out);
 }
 
-static unsigned long read_variable_length_quantity(FILE *in)
+static uint32_t read_variable_length_quantity(FILE *in)
 {
 	unsigned char b;
-	unsigned long value = 0;
+	uint32_t value = 0;
 
 	do
 	{
@@ -197,7 +198,7 @@ static unsigned long read_variable_length_quantity(FILE *in)
 	return value;
 }
 
-static void write_variable_length_quantity(FILE *out, unsigned long value)
+static void write_variable_length_quantity(FILE *out, uint32_t value)
 {
 	unsigned char buffer[4];
 	int offset = 3;
@@ -345,7 +346,7 @@ MidiFile_t MidiFile_load(char *filename)
 	MidiFile_t midi_file;
 	FILE *in;
 	unsigned char chunk_id[4], division_type_and_resolution[4];
-	long chunk_size, chunk_start;
+	int32_t chunk_size, chunk_start;
 	int file_format, number_of_tracks, number_of_tracks_read = 0;
 
 	if ((filename == NULL) || ((in = fopen(filename, "rb")) == NULL)) return NULL;
@@ -431,7 +432,7 @@ MidiFile_t MidiFile_load(char *filename)
 		if (memcmp(chunk_id, "MTrk", 4) == 0)
 		{
 			MidiFileTrack_t track = MidiFile_createTrack(midi_file);
-			long tick, previous_tick = 0;
+			int32_t tick, previous_tick = 0;
 			unsigned char status, running_status = 0;
 			int at_end_of_track = 0;
 
@@ -516,7 +517,7 @@ MidiFile_t MidiFile_load(char *filename)
 							case 0xF7:
 							{
 								int data_length = read_variable_length_quantity(in) + 1;
-								unsigned char *data_buffer = malloc(data_length);
+								unsigned char *data_buffer = (unsigned char*)malloc(data_length);
 								data_buffer[0] = status;
 								fread(data_buffer + 1, 1, data_length - 1, in);
 								MidiFileTrack_createSysexEvent(track, tick, data_length, data_buffer);
@@ -527,7 +528,7 @@ MidiFile_t MidiFile_load(char *filename)
 							{
 								int number = fgetc(in);
 								int data_length = read_variable_length_quantity(in);
-								unsigned char *data_buffer = malloc(data_length);
+								unsigned char *data_buffer = (unsigned char*) malloc(data_length);
 								fread(data_buffer, 1, data_length, in);
 
 								if (number == 0x2F)
@@ -609,7 +610,7 @@ int MidiFile_save(MidiFile_t midi_file, const char* filename)
 	for (track = MidiFile_getFirstTrack(midi_file); track != NULL; track = MidiFileTrack_getNextTrack(track))
 	{
 		MidiFileEvent_t event;
-		long track_size_offset, track_start_offset, track_end_offset, tick, previous_tick;
+		int32_t track_size_offset, track_start_offset, track_end_offset, tick, previous_tick;
 
 		fwrite("MTrk", 1, 4, out);
 
@@ -892,7 +893,7 @@ int MidiFile_visitEvents(MidiFile_t midi_file, MidiFileEventVisitorCallback_t vi
 	return 0;
 }
 
-float MidiFile_getTimeFromTick(MidiFile_t midi_file, long tick)
+float MidiFile_getTimeFromTick(MidiFile_t midi_file, int32_t tick)
 {
 	switch (MidiFile_getDivisionType(midi_file))
 	{
@@ -901,7 +902,7 @@ float MidiFile_getTimeFromTick(MidiFile_t midi_file, long tick)
 			MidiFileTrack_t conductor_track = MidiFile_getFirstTrack(midi_file);
 			MidiFileEvent_t event;
 			float tempo_event_time = 0.0;
-			long tempo_event_tick = 0;
+			int32_t tempo_event_tick = 0;
 			float tempo = 120.0;
 
 			for (event = MidiFileTrack_getFirstEvent(conductor_track); (event != NULL) && (MidiFileEvent_getTick(event) < tick); event = MidiFileEvent_getNextEventInTrack(event))
@@ -939,7 +940,7 @@ float MidiFile_getTimeFromTick(MidiFile_t midi_file, long tick)
 	}
 }
 
-long MidiFile_getTickFromTime(MidiFile_t midi_file, float time)
+int32_t MidiFile_getTickFromTime(MidiFile_t midi_file, float time)
 {
 	switch (MidiFile_getDivisionType(midi_file))
 	{
@@ -948,7 +949,7 @@ long MidiFile_getTickFromTime(MidiFile_t midi_file, float time)
 			MidiFileTrack_t conductor_track = MidiFile_getFirstTrack(midi_file);
 			MidiFileEvent_t event;
 			float tempo_event_time = 0.0;
-			long tempo_event_tick = 0;
+			int32_t tempo_event_tick = 0;
 			float tempo = 120.0;
 
 			for (event = MidiFileTrack_getFirstEvent(conductor_track); event != NULL; event = MidiFileEvent_getNextEventInTrack(event))
@@ -967,19 +968,19 @@ long MidiFile_getTickFromTime(MidiFile_t midi_file, float time)
 		}
 		case MIDI_FILE_DIVISION_TYPE_SMPTE24:
 		{
-			return (long)(time * MidiFile_getResolution(midi_file) * 24.0);
+			return (int32_t)(time * MidiFile_getResolution(midi_file) * 24.0);
 		}
 		case MIDI_FILE_DIVISION_TYPE_SMPTE25:
 		{
-			return (long)(time * MidiFile_getResolution(midi_file) * 25.0);
+			return (int32_t)(time * MidiFile_getResolution(midi_file) * 25.0);
 		}
 		case MIDI_FILE_DIVISION_TYPE_SMPTE30DROP:
 		{
-			return (long)(time * MidiFile_getResolution(midi_file) * 29.97);
+			return (int32_t)(time * MidiFile_getResolution(midi_file) * 29.97);
 		}
 		case MIDI_FILE_DIVISION_TYPE_SMPTE30:
 		{
-			return (long)(time * MidiFile_getResolution(midi_file) * 30.0);
+			return (int32_t)(time * MidiFile_getResolution(midi_file) * 30.0);
 		}
 		default:
 		{
@@ -988,7 +989,7 @@ long MidiFile_getTickFromTime(MidiFile_t midi_file, float time)
 	}
 }
 
-float MidiFile_getBeatFromTick(MidiFile_t midi_file, long tick)
+float MidiFile_getBeatFromTick(MidiFile_t midi_file, int32_t tick)
 {
 	switch (MidiFile_getDivisionType(midi_file))
 	{
@@ -1019,13 +1020,13 @@ float MidiFile_getBeatFromTick(MidiFile_t midi_file, long tick)
 	}
 }
 
-long MidiFile_getTickFromBeat(MidiFile_t midi_file, float beat)
+int32_t MidiFile_getTickFromBeat(MidiFile_t midi_file, float beat)
 {
 	switch (MidiFile_getDivisionType(midi_file))
 	{
 		case MIDI_FILE_DIVISION_TYPE_PPQ:
 		{
-			return (long)(beat * MidiFile_getResolution(midi_file));
+			return (int32_t)(beat * MidiFile_getResolution(midi_file));
 		}
 		case MIDI_FILE_DIVISION_TYPE_SMPTE24:
 		{
@@ -1098,13 +1099,13 @@ int MidiFileTrack_getNumber(MidiFileTrack_t track)
 	return track->number;
 }
 
-long MidiFileTrack_getEndTick(MidiFileTrack_t track)
+int32_t MidiFileTrack_getEndTick(MidiFileTrack_t track)
 {
 	if (track == NULL) return -1;
 	return track->end_tick;
 }
 
-int MidiFileTrack_setEndTick(MidiFileTrack_t track, long end_tick)
+int MidiFileTrack_setEndTick(MidiFileTrack_t track, int32_t end_tick)
 {
 	if ((track == NULL) || ((track->last_event != NULL) && (end_tick < track->last_event->tick))) return -1;
 	track->end_tick = end_tick;
@@ -1157,7 +1158,7 @@ MidiFileTrack_t MidiFileTrack_getNextTrack(MidiFileTrack_t track)
 	return track->next_track;
 }
 
-MidiFileEvent_t MidiFileTrack_createNoteOffEvent(MidiFileTrack_t track, long tick, int channel, int note, int velocity)
+MidiFileEvent_t MidiFileTrack_createNoteOffEvent(MidiFileTrack_t track, int32_t tick, int channel, int note, int velocity)
 {
 	MidiFileEvent_t new_event;
 
@@ -1176,7 +1177,7 @@ MidiFileEvent_t MidiFileTrack_createNoteOffEvent(MidiFileTrack_t track, long tic
 	return new_event;
 }
 
-MidiFileEvent_t MidiFileTrack_createNoteOnEvent(MidiFileTrack_t track, long tick, int channel, int note, int velocity)
+MidiFileEvent_t MidiFileTrack_createNoteOnEvent(MidiFileTrack_t track, int32_t tick, int channel, int note, int velocity)
 {
 	MidiFileEvent_t new_event;
 
@@ -1195,7 +1196,7 @@ MidiFileEvent_t MidiFileTrack_createNoteOnEvent(MidiFileTrack_t track, long tick
 	return new_event;
 }
 
-MidiFileEvent_t MidiFileTrack_createKeyPressureEvent(MidiFileTrack_t track, long tick, int channel, int note, int amount)
+MidiFileEvent_t MidiFileTrack_createKeyPressureEvent(MidiFileTrack_t track, int32_t tick, int channel, int note, int amount)
 {
 	MidiFileEvent_t new_event;
 
@@ -1214,7 +1215,7 @@ MidiFileEvent_t MidiFileTrack_createKeyPressureEvent(MidiFileTrack_t track, long
 	return new_event;
 }
 
-MidiFileEvent_t MidiFileTrack_createControlChangeEvent(MidiFileTrack_t track, long tick, int channel, int number, int value)
+MidiFileEvent_t MidiFileTrack_createControlChangeEvent(MidiFileTrack_t track, int32_t tick, int channel, int number, int value)
 {
 	MidiFileEvent_t new_event;
 
@@ -1233,7 +1234,7 @@ MidiFileEvent_t MidiFileTrack_createControlChangeEvent(MidiFileTrack_t track, lo
 	return new_event;
 }
 
-MidiFileEvent_t MidiFileTrack_createProgramChangeEvent(MidiFileTrack_t track, long tick, int channel, int number)
+MidiFileEvent_t MidiFileTrack_createProgramChangeEvent(MidiFileTrack_t track, int32_t tick, int channel, int number)
 {
 	MidiFileEvent_t new_event;
 
@@ -1251,7 +1252,7 @@ MidiFileEvent_t MidiFileTrack_createProgramChangeEvent(MidiFileTrack_t track, lo
 	return new_event;
 }
 
-MidiFileEvent_t MidiFileTrack_createChannelPressureEvent(MidiFileTrack_t track, long tick, int channel, int amount)
+MidiFileEvent_t MidiFileTrack_createChannelPressureEvent(MidiFileTrack_t track, int32_t tick, int channel, int amount)
 {
 	MidiFileEvent_t new_event;
 
@@ -1269,7 +1270,7 @@ MidiFileEvent_t MidiFileTrack_createChannelPressureEvent(MidiFileTrack_t track, 
 	return new_event;
 }
 
-MidiFileEvent_t MidiFileTrack_createPitchWheelEvent(MidiFileTrack_t track, long tick, int channel, int value)
+MidiFileEvent_t MidiFileTrack_createPitchWheelEvent(MidiFileTrack_t track, int32_t tick, int channel, int value)
 {
 	MidiFileEvent_t new_event;
 
@@ -1287,7 +1288,7 @@ MidiFileEvent_t MidiFileTrack_createPitchWheelEvent(MidiFileTrack_t track, long 
 	return new_event;
 }
 
-MidiFileEvent_t MidiFileTrack_createSysexEvent(MidiFileTrack_t track, long tick, int data_length, unsigned char *data_buffer)
+MidiFileEvent_t MidiFileTrack_createSysexEvent(MidiFileTrack_t track, int32_t tick, int data_length, unsigned char *data_buffer)
 {
 	MidiFileEvent_t new_event;
 
@@ -1298,7 +1299,7 @@ MidiFileEvent_t MidiFileTrack_createSysexEvent(MidiFileTrack_t track, long tick,
 	new_event->tick = tick;
 	new_event->type = MIDI_FILE_EVENT_TYPE_SYSEX;
 	new_event->u.sysex.data_length = data_length;
-	new_event->u.sysex.data_buffer = malloc(data_length);
+	new_event->u.sysex.data_buffer = (unsigned char*)malloc(data_length);
 	memcpy(new_event->u.sysex.data_buffer, data_buffer, data_length);
 	new_event->should_be_visited = 0;
 	add_event(new_event);
@@ -1306,7 +1307,7 @@ MidiFileEvent_t MidiFileTrack_createSysexEvent(MidiFileTrack_t track, long tick,
 	return new_event;
 }
 
-MidiFileEvent_t MidiFileTrack_createMetaEvent(MidiFileTrack_t track, long tick, int number, int data_length, unsigned char *data_buffer)
+MidiFileEvent_t MidiFileTrack_createMetaEvent(MidiFileTrack_t track, int32_t tick, int number, int data_length, unsigned char *data_buffer)
 {
 	MidiFileEvent_t new_event;
 
@@ -1318,7 +1319,7 @@ MidiFileEvent_t MidiFileTrack_createMetaEvent(MidiFileTrack_t track, long tick, 
 	new_event->type = MIDI_FILE_EVENT_TYPE_META;
 	new_event->u.meta.number = number;
 	new_event->u.meta.data_length = data_length;
-	new_event->u.meta.data_buffer = malloc(data_length);
+	new_event->u.meta.data_buffer = (unsigned char*)malloc(data_length);
 	memcpy(new_event->u.meta.data_buffer, data_buffer, data_length);
 	new_event->should_be_visited = 0;
 	add_event(new_event);
@@ -1326,16 +1327,16 @@ MidiFileEvent_t MidiFileTrack_createMetaEvent(MidiFileTrack_t track, long tick, 
 	return new_event;
 }
 
-MidiFileEvent_t MidiFileTrack_createNoteStartAndEndEvents(MidiFileTrack_t track, long start_tick, long end_tick, int channel, int note, int start_velocity, int end_velocity)
+MidiFileEvent_t MidiFileTrack_createNoteStartAndEndEvents(MidiFileTrack_t track, int32_t start_tick, int32_t end_tick, int channel, int note, int start_velocity, int end_velocity)
 {
 	MidiFileEvent_t start_event = MidiFileTrack_createNoteOnEvent(track, start_tick, channel, note, start_velocity);
 	MidiFileEvent_t end_event = MidiFileTrack_createNoteOffEvent(track, end_tick, channel, note, end_velocity);
 	return start_event;
 }
 
-MidiFileEvent_t MidiFileTrack_createTempoEvent(MidiFileTrack_t track, long tick, float tempo)
+MidiFileEvent_t MidiFileTrack_createTempoEvent(MidiFileTrack_t track, int32_t tick, float tempo)
 {
-	long midi_tempo = 60000000 / tempo;
+	int32_t midi_tempo = 60000000 / tempo;
 	unsigned char buffer[3];
 	buffer[0] = (midi_tempo >> 16) & 0xFF;
 	buffer[1] = (midi_tempo >> 8) & 0xFF;
@@ -1343,7 +1344,7 @@ MidiFileEvent_t MidiFileTrack_createTempoEvent(MidiFileTrack_t track, long tick,
 	return MidiFileTrack_createMetaEvent(track, tick, 0x51, 3, buffer);
 }
 
-MidiFileEvent_t MidiFileTrack_createVoiceEvent(MidiFileTrack_t track, long tick, unsigned long data)
+MidiFileEvent_t MidiFileTrack_createVoiceEvent(MidiFileTrack_t track, int32_t tick, uint32_t data)
 {
 	MidiFileEvent_t new_event;
 
@@ -1456,13 +1457,13 @@ MidiFileEvent_t MidiFileEvent_getNextEventInFile(MidiFileEvent_t event)
 	return event->next_event_in_file;
 }
 
-long MidiFileEvent_getTick(MidiFileEvent_t event)
+int32_t MidiFileEvent_getTick(MidiFileEvent_t event)
 {
 	if (event == NULL) return -1;
 	return event->tick;
 }
 
-int MidiFileEvent_setTick(MidiFileEvent_t event, long tick)
+int MidiFileEvent_setTick(MidiFileEvent_t event, int32_t tick)
 {
 	if (event == NULL) return -1;
 	remove_event(event);
@@ -1764,7 +1765,7 @@ int MidiFileSysexEvent_setData(MidiFileEvent_t event, int data_length, unsigned 
 	if ((event == NULL) || (event->type != MIDI_FILE_EVENT_TYPE_SYSEX) || (data_length < 1) || (data_buffer == NULL)) return -1;
 	free(event->u.sysex.data_buffer);
 	event->u.sysex.data_length = data_length;
-	event->u.sysex.data_buffer = malloc(data_length);
+	event->u.sysex.data_buffer = (unsigned char*) malloc(data_length);
 	memcpy(event->u.sysex.data_buffer, data_buffer, data_length);
 	return 0;
 }
@@ -1799,7 +1800,7 @@ int MidiFileMetaEvent_setData(MidiFileEvent_t event, int data_length, unsigned c
 	if ((event == NULL) || (event->type != MIDI_FILE_EVENT_TYPE_META) || (data_length < 1) || (data_buffer == NULL)) return -1;
 	free(event->u.meta.data_buffer);
 	event->u.meta.data_length = data_length;
-	event->u.meta.data_buffer = malloc(data_length);
+	event->u.meta.data_buffer = (unsigned char*)malloc(data_length);
 	memcpy(event->u.meta.data_buffer, data_buffer, data_length);
 	return 0;
 }
@@ -2005,7 +2006,7 @@ MidiFileEvent_t MidiFileNoteEndEvent_getNoteStartEvent(MidiFileEvent_t event)
 float MidiFileTempoEvent_getTempo(MidiFileEvent_t event)
 {
 	unsigned char *buffer;
-	long midi_tempo;
+	int32_t midi_tempo;
 
 	if (! MidiFileEvent_isTempoEvent(event)) return -1;
 
@@ -2016,7 +2017,7 @@ float MidiFileTempoEvent_getTempo(MidiFileEvent_t event)
 
 int MidiFileTempoEvent_setTempo(MidiFileEvent_t event, float tempo)
 {
-	long midi_tempo;
+	int32_t midi_tempo;
 	unsigned char buffer[3];
 
 	if (! MidiFileEvent_isTempoEvent(event)) return -1;
@@ -2028,7 +2029,7 @@ int MidiFileTempoEvent_setTempo(MidiFileEvent_t event, float tempo)
 	return MidiFileMetaEvent_setData(event, 3, buffer);
 }
 
-unsigned long MidiFileVoiceEvent_getData(MidiFileEvent_t event)
+uint32_t MidiFileVoiceEvent_getData(MidiFileEvent_t event)
 {
 	switch (MidiFileEvent_getType(event))
 	{
@@ -2037,7 +2038,7 @@ unsigned long MidiFileVoiceEvent_getData(MidiFileEvent_t event)
 			union
 			{
 				unsigned char data_as_bytes[4];
-				unsigned long data_as_uint32;
+				uint32_t data_as_uint32;
 			}
 			u;
 
@@ -2052,7 +2053,7 @@ unsigned long MidiFileVoiceEvent_getData(MidiFileEvent_t event)
 			union
 			{
 				unsigned char data_as_bytes[4];
-				unsigned long data_as_uint32;
+				uint32_t data_as_uint32;
 			}
 			u;
 
@@ -2067,7 +2068,7 @@ unsigned long MidiFileVoiceEvent_getData(MidiFileEvent_t event)
 			union
 			{
 				unsigned char data_as_bytes[4];
-				unsigned long data_as_uint32;
+				uint32_t data_as_uint32;
 			}
 			u;
 
@@ -2082,7 +2083,7 @@ unsigned long MidiFileVoiceEvent_getData(MidiFileEvent_t event)
 			union
 			{
 				unsigned char data_as_bytes[4];
-				unsigned long data_as_uint32;
+				uint32_t data_as_uint32;
 			}
 			u;
 
@@ -2097,7 +2098,7 @@ unsigned long MidiFileVoiceEvent_getData(MidiFileEvent_t event)
 			union
 			{
 				unsigned char data_as_bytes[4];
-				unsigned long data_as_uint32;
+				uint32_t data_as_uint32;
 			}
 			u;
 
@@ -2112,7 +2113,7 @@ unsigned long MidiFileVoiceEvent_getData(MidiFileEvent_t event)
 			union
 			{
 				unsigned char data_as_bytes[4];
-				unsigned long data_as_uint32;
+				uint32_t data_as_uint32;
 			}
 			u;
 
@@ -2127,7 +2128,7 @@ unsigned long MidiFileVoiceEvent_getData(MidiFileEvent_t event)
 			union
 			{
 				unsigned char data_as_bytes[4];
-				unsigned long data_as_uint32;
+				uint32_t data_as_uint32;
 			}
 			u;
 
@@ -2144,11 +2145,11 @@ unsigned long MidiFileVoiceEvent_getData(MidiFileEvent_t event)
 	}
 }
 
-int MidiFileVoiceEvent_setData(MidiFileEvent_t event, unsigned long data)
+int MidiFileVoiceEvent_setData(MidiFileEvent_t event, uint32_t data)
 {
 	union
 	{
-		unsigned long data_as_uint32;
+		uint32_t data_as_uint32;
 		unsigned char data_as_bytes[4];
 	}
 	u;

@@ -12,7 +12,7 @@
 
 #ifndef SDHumming_STYPES_H_
 #define SDHumming_STYPES_H_
-
+#include <stdint.h>
 #include <limits.h>
 
 #define ERROR_CODE_FILE_CANNOT_OPEN -1001
@@ -30,7 +30,9 @@
 
 #define FUSION_RATIO 0.66f  
 
-#define MAX_SIG_SIZE   85
+//#define MAX_SIG_SIZE   85	//VIJAYA
+#define MAX_SIG_SIZE   140
+//#define MAX_SIG_SIZE   120
 #define MAX_ITERATIONS 500
 #define EMD_INFINITY       1e20f
 #define MAX_NUMBER INT_MAX
@@ -60,7 +62,8 @@
 /* the window size of median filter*/ 
 #define MEDIAN_FILTER_WINDOWS_SIZE 5
 
-#define MAX_EMD_FEASIZE 100
+//#define MAX_EMD_FEASIZE 100
+#define MAX_EMD_FEASIZE 200	// VIJAYA
 
 typedef struct {
 	float fNoteValue; /* note value */
@@ -104,17 +107,17 @@ typedef struct SWaveDataStru{
 /* wave header struct */ 
 typedef  struct WAVE_HEADERTag{
 	char RIFF[4];
-	long Whgilelen;
+	int32_t Whgilelen;
 	char WAVEfmt[8];
-	long version;
+	int32_t version;
 	short  FormatTag;
 	short  Channels;
-	long SamplePerSec;
-	long AvgBytesPerSec;
+	int32_t SamplePerSec;
+	int32_t AvgBytesPerSec;
 	short  blockalign;
 	short  BitPerSample;
 	char data[4];
-	long Pcmfilelen;
+	int32_t Pcmfilelen;
 }WAVE_HEADER;
 
 typedef struct SPolar{

@@ -101,31 +101,31 @@ extern "C"{
 	MidiFileEvent_t MidiFile_getFirstEvent(MidiFile_t midi_file);
 	MidiFileEvent_t MidiFile_getLastEvent(MidiFile_t midi_file);
 	int MidiFile_visitEvents(MidiFile_t midi_file, MidiFileEventVisitorCallback_t visitor_callback, void *user_data);
-	float MidiFile_getTimeFromTick(MidiFile_t midi_file, long tick); /* time is in seconds */
-	long MidiFile_getTickFromTime(MidiFile_t midi_file, float time);
-	float MidiFile_getBeatFromTick(MidiFile_t midi_file, long tick);
-	long MidiFile_getTickFromBeat(MidiFile_t midi_file, float beat);
+	float MidiFile_getTimeFromTick(MidiFile_t midi_file, int32_t tick); /* time is in seconds */
+	int32_t MidiFile_getTickFromTime(MidiFile_t midi_file, float time);
+	float MidiFile_getBeatFromTick(MidiFile_t midi_file, int32_t tick);
+	int32_t MidiFile_getTickFromBeat(MidiFile_t midi_file, float beat);
 	
 	int MidiFileTrack_delete(MidiFileTrack_t track);
 	MidiFile_t MidiFileTrack_getMidiFile(MidiFileTrack_t track);
 	int MidiFileTrack_getNumber(MidiFileTrack_t track);
-	long MidiFileTrack_getEndTick(MidiFileTrack_t track);
-	int MidiFileTrack_setEndTick(MidiFileTrack_t track, long end_tick);
+	int32_t MidiFileTrack_getEndTick(MidiFileTrack_t track);
+	int MidiFileTrack_setEndTick(MidiFileTrack_t track, int32_t end_tick);
 	MidiFileTrack_t MidiFileTrack_createTrackBefore(MidiFileTrack_t track);
 	MidiFileTrack_t MidiFileTrack_getPreviousTrack(MidiFileTrack_t track);
 	MidiFileTrack_t MidiFileTrack_getNextTrack(MidiFileTrack_t track);
-	MidiFileEvent_t MidiFileTrack_createNoteOffEvent(MidiFileTrack_t track, long tick, int channel, int note, int velocity);
-	MidiFileEvent_t MidiFileTrack_createNoteOnEvent(MidiFileTrack_t track, long tick, int channel, int note, int velocity);
-	MidiFileEvent_t MidiFileTrack_createKeyPressureEvent(MidiFileTrack_t track, long tick, int channel, int note, int amount);
-	MidiFileEvent_t MidiFileTrack_createControlChangeEvent(MidiFileTrack_t track, long tick, int channel, int number, int value);
-	MidiFileEvent_t MidiFileTrack_createProgramChangeEvent(MidiFileTrack_t track, long tick, int channel, int number);
-	MidiFileEvent_t MidiFileTrack_createChannelPressureEvent(MidiFileTrack_t track, long tick, int channel, int amount);
-	MidiFileEvent_t MidiFileTrack_createPitchWheelEvent(MidiFileTrack_t track, long tick, int channel, int value);
-	MidiFileEvent_t MidiFileTrack_createSysexEvent(MidiFileTrack_t track, long tick, int data_length, unsigned char *data_buffer);
-	MidiFileEvent_t MidiFileTrack_createMetaEvent(MidiFileTrack_t track, long tick, int number, int data_length, unsigned char *data_buffer);
-	MidiFileEvent_t MidiFileTrack_createNoteStartAndEndEvents(MidiFileTrack_t track, long start_tick, long end_tick, int channel, int note, int start_velocity, int end_velocity); /* returns the start event */
-	MidiFileEvent_t MidiFileTrack_createTempoEvent(MidiFileTrack_t track, long tick, float tempo); /* tempo is in BPM */
-	MidiFileEvent_t MidiFileTrack_createVoiceEvent(MidiFileTrack_t track, long tick, unsigned long data);
+	MidiFileEvent_t MidiFileTrack_createNoteOffEvent(MidiFileTrack_t track, int32_t tick, int channel, int note, int velocity);
+	MidiFileEvent_t MidiFileTrack_createNoteOnEvent(MidiFileTrack_t track, int32_t tick, int channel, int note, int velocity);
+	MidiFileEvent_t MidiFileTrack_createKeyPressureEvent(MidiFileTrack_t track, int32_t tick, int channel, int note, int amount);
+	MidiFileEvent_t MidiFileTrack_createControlChangeEvent(MidiFileTrack_t track, int32_t tick, int channel, int number, int value);
+	MidiFileEvent_t MidiFileTrack_createProgramChangeEvent(MidiFileTrack_t track, int32_t tick, int channel, int number);
+	MidiFileEvent_t MidiFileTrack_createChannelPressureEvent(MidiFileTrack_t track, int32_t tick, int channel, int amount);
+	MidiFileEvent_t MidiFileTrack_createPitchWheelEvent(MidiFileTrack_t track, int32_t tick, int channel, int value);
+	MidiFileEvent_t MidiFileTrack_createSysexEvent(MidiFileTrack_t track, int32_t tick, int data_length, unsigned char *data_buffer);
+	MidiFileEvent_t MidiFileTrack_createMetaEvent(MidiFileTrack_t track, int32_t tick, int number, int data_length, unsigned char *data_buffer);
+	MidiFileEvent_t MidiFileTrack_createNoteStartAndEndEvents(MidiFileTrack_t track, int32_t start_tick, int32_t end_tick, int channel, int note, int start_velocity, int end_velocity); /* returns the start event */
+	MidiFileEvent_t MidiFileTrack_createTempoEvent(MidiFileTrack_t track, int32_t tick, float tempo); /* tempo is in BPM */
+	MidiFileEvent_t MidiFileTrack_createVoiceEvent(MidiFileTrack_t track, int32_t tick, uint32_t data);
 	MidiFileEvent_t MidiFileTrack_getFirstEvent(MidiFileTrack_t track);
 	MidiFileEvent_t MidiFileTrack_getLastEvent(MidiFileTrack_t track);
 	int MidiFileTrack_visitEvents(MidiFileTrack_t track, MidiFileEventVisitorCallback_t visitor_callback, void *user_data);
@@ -138,8 +138,8 @@ extern "C"{
 	MidiFileEvent_t MidiFileEvent_getNextEventInTrack(MidiFileEvent_t event);
 	MidiFileEvent_t MidiFileEvent_getPreviousEventInFile(MidiFileEvent_t event);
 	MidiFileEvent_t MidiFileEvent_getNextEventInFile(MidiFileEvent_t event);
-	long MidiFileEvent_getTick(MidiFileEvent_t event);
-	int MidiFileEvent_setTick(MidiFileEvent_t event, long tick);
+	int32_t MidiFileEvent_getTick(MidiFileEvent_t event);
+	int MidiFileEvent_setTick(MidiFileEvent_t event, int32_t tick);
 	MidiFileEventType_t MidiFileEvent_getType(MidiFileEvent_t event);
 	int MidiFileEvent_isNoteStartEvent(MidiFileEvent_t event);
 	int MidiFileEvent_isNoteEndEvent(MidiFileEvent_t event);
@@ -218,8 +218,8 @@ extern "C"{
 	float MidiFileTempoEvent_getTempo(MidiFileEvent_t event);
 	int MidiFileTempoEvent_setTempo(MidiFileEvent_t event, float tempo);
 	
-	unsigned long MidiFileVoiceEvent_getData(MidiFileEvent_t event);
-	int MidiFileVoiceEvent_setData(MidiFileEvent_t event, unsigned long data);
+	uint32_t MidiFileVoiceEvent_getData(MidiFileEvent_t event);
+	int MidiFileVoiceEvent_setData(MidiFileEvent_t event, uint32_t data);
 	
 #ifdef __cplusplus
 }
