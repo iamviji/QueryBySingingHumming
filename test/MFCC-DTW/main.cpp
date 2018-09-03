@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
 
     
     cout<<a->ComputeDTW(mfccs1,mfccs2);//利用动态时间规整算法，计算两个语音的相似度，越小相似度越大
-#endif
+#else
     float* points1;
     int len1;
     float* points2;
@@ -220,6 +220,7 @@ int main(int argc, char *argv[])
     WaveFunction* a=new WaveFunction(128,13);
     float r = a->ComputeDTW(points1,points2, len1, len2);
     cout << "RESULT:"<<r<<"\n";
+#endif
     
     return 0;
 }

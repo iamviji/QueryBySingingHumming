@@ -1,0 +1,73 @@
+1. Execute following command to generate exes
+	make
+   It generates following exe 
+	a)rank-qbh.exe
+	b)rank-dtw.exe
+	c)media2csv.exe
+	d)model.exe
+	e)tester.exe
+
+	Note:  model.exe and tester.exe are the original exe supported by original source
+	and it can be used to search midi database by giving humming querry. So, these
+	exes are not required for GuruSangeetha.
+
+2. Exes which are meant for GuruSangeetha Project
+
+	A)./rank-qbh.exe : It takes two wave files and gives similarity ranking. It uses additional logic above dtw.
+ 	Usage of this exe is as follows
+	rank-qbh.exe ref.wav test.wav sample_rate=[11025,16000,22050,24000,32000,44100]
+   
+	eg 1:  
+	./rank-qbh.exe test/sample-rate-11025/ref.wav test/sample-rate-11025/trial-1.wav 11025
+
+	output:
+		FS=11025BitPerSampe=16
+		BitPerSampe=16
+		NoteBased.SimilarityScore=23.294,SimilarityScale=0.925,Mid=0,PID=0
+		final
+		FrameBasedMatch.SimilarityScore=28.878651
+
+	./rank-dtw.exe test/sample-rate-11025/ref.wav test/sample-rate-11025/trial-2.wav 11025
+
+		FS=11025BitPerSampe=16
+		BitPerSampe=16
+		NoteBased.SimilarityScore=29.7486,SimilarityScale=0.775,Mid=0,PID=0
+		final
+		FrameBasedMatch.SimilarityScore=153.979660
+
+	B)./rank-dtw.exe : It takes csv format note values and gives similarity ranking using dtw.
+	Note : There are two way one can get csv format note from wav  as explained bellow.
+		1) using sonic api : http://www.sonicapi.com/ and 
+		json to csv converter : https://json-csv.com/
+		2) using exe medi2csv.exe
+			usage: media2csv.exe media.wav sample_rate=[11025,16000,22050,24000,32000,44100]
+
+
+	then use rank-dtw.exe over those csv to compare 
+		usage: rank-dtw.exe ref.csv test.csv [pitch_curve_sample_rate{=0.1,0.2..}] 
+
+	eg 1:
+
+	./rank-dtw.exe test/sample-rate-11025/sonic-ref.csv test/sample-rate-11025/sonic-trial-1.csv 2
+
+		SampleRate=2.000000file1
+		file2
+		result:31.139
+		Elapsed time: 0.001790 
+	eg 2:
+		./media2csv.exe test/sample-rate-11025/ref.wav 11025 > ref.csv
+		./media2csv.exe test/sample-rate-11025/trial-1.wav 11025 >trial-1.csv
+		./rank-dtw.exe ref.csv trial-1.csv 2
+		SampleRate=2.000000file1
+		file2
+		result:2.4324
+		Elapsed time: 0.001657 
+
+3: Status:	
+	./rank-qbh.exe
+	a) wav,wav		: possible, limited tested 
+	b) wav2csv,wav2csv	: only note based ranking is possible, yet to be tested.
+	./rank-dtw.exe
+	a) csv,csv		: possible, not any other format is supported, limited tested
+
+Note : test directory contains sample test input files
