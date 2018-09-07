@@ -9,9 +9,9 @@
 
 	Note:  model.exe and tester.exe are the original exe supported by original source
 	and it can be used to search midi database by giving humming querry. So, these
-	exes are not required for GuruSangeetha.
+	exes are not required for Our Experiment.
 
-2. Exes which are meant for GuruSangeetha Project
+2. Exes which are meant for Our Experiment 
 
 	A)./rank-qbh.exe : It takes two wave files and gives similarity ranking. It uses additional logic above dtw.
  	Usage of this exe is as follows
